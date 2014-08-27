@@ -1,0 +1,4 @@
+mongo.ip= 10.0.2.40
+mongo.port=27017
+mongo.logDBName=autoTaskDB
+mongo.logTableName=autoTaskLog

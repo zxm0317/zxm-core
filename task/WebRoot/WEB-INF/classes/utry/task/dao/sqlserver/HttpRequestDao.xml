@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="utry.task.dao.HttpRequestDao">
+	<resultMap type="HttpRequest" id="HttpRequestMap">
+		<id property="id" column="Id" />
+		<result property="jobId" column="JobId" />
+		<result property="url" column="Url" />
+		<result property="parameter" column="Parameter" />
+		<result property="requestType" column="RequestType" />
+		<result property="serialNumber" column="SerialNumber" />
+	</resultMap>
+
+	<sql id="HttpRequestColumns">
+		Id,JobId,Url,Parameter,RequestType,SerialNumber
+	</sql>
+	
+	<select id="findId" parameterType="Integer" resultMap="HttpRequestMap">
+		SELECT
+		<include refid="HttpRequestColumns" />
+		FROM T_HttpRequest  WHERE Id = #{id,jdbcType=INTEGER}
+	</select>
+		
+	<select id="findJobId" parameterType="Integer" resultMap="HttpRequestMap">
+		SELECT
+		<include refid="HttpRequestColumns" />
+		FROM T_HttpRequest  WHERE JobId = #{jobId,jdbcType=INTEGER}
+		ORDER BY SerialNumber,Id ASC
+	</select>		
+		
+	<select id="findAll" resultMap="HttpRequestMap">
+		SELECT 
+		<include refid="HttpRequestColumns" />
+		FROM T_HttpRequest
+	</select>	
+	
+	<select id="count"  resultType="Integer">
+		SELECT
+		count(Id)
+		FROM T_HttpRequest 
+	</select>
+	<select id="countJobId"  parameterType="Integer" resultType="Integer">
+		SELECT
+		count(Id)
+		FROM T_HttpRequest
+		WHERE JobId = #{jobId,jdbcType=INTEGER}
+	</select>
+
+	<insert id="insert" parameterType="HttpRequest" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO T_HttpRequest(JobId,Url,Parameter,RequestType,SerialNumber) 
+		values(
+		#{jobId,jdbcType=INTEGER},
+		#{url,jdbcType=VARCHAR},
+		#{parameter,jdbcType=VARCHAR},
+		#{requestType,jdbcType=VARCHAR},
+		#{serialNumber,jdbcType=INTEGER}
+		)
+	</insert>
+	<delete id="delete" parameterType="Integer">
+		DELETE FROM T_HttpRequest WHERE Id=#{id,jdbcType=INTEGER}
+	</delete>
+	
+	<update id="update" parameterType="HttpRequest">
+		UPDATE T_HttpRequest SET
+		JobId=#{jobId,jdbcType=INTEGER},
+		Url=#{url,jdbcType=VARCHAR},
+		Parameter=#{parameter,jdbcType=VARCHAR},
+		RequestType=#{requestType,jdbcType=VARCHAR},
+		SerialNumber=#{serialNumber,jdbcType=INTEGER}
+		WHERE Id=#{id,jdbcType=INTEGER}
+	</update>
+</mapper>

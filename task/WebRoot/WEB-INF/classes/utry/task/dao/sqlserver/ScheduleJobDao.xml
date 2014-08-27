@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	<mapper namespace="utry.task.dao.ScheduleJobDao">
+	
+	<resultMap type="ScheduleJob" id="ScheduleJobMap">
+		<id property="id" column="Id" />
+		<result property="taskName" column="TaskName" />
+		<result property="taskCode" column="TaskCode" />
+		<result property="isEnable" column="IsEnable" />
+		<result property="isOrder" column="IsOrder" />
+		<result property="cron" column="Cron" />
+		<result property="memo" column="Memo" />
+	</resultMap>
+	
+	<resultMap type="ScheduleJobVo" id="ScheduleJobVoMap">
+		<id property="id" column="Id" />
+		<result property="taskName" column="TaskName" />
+		<result property="taskCode" column="TaskCode" />
+		<result property="isEnable" column="IsEnable" />
+		<result property="isOrder" column="IsOrder" />
+		<result property="cron" column="Cron" />
+		<result property="memo" column="Memo" />
+	</resultMap>
+	<sql id="ScheduleJobColumns">
+		Id,TaskName,TaskCode,IsEnable,IsOrder,Cron,Memo
+	</sql>
+	
+	<sql id="pagedSearchFilters">
+		<if test="keywords!=null and keywords!=''">
+   			AND 
+   			(
+   			TaskName LIKE '%'+#{keywords,jdbcType=VARCHAR}+'%'	
+   			OR
+   			TaskCode LIKE '%'+#{keywords,jdbcType=VARCHAR}+'%'	
+   			OR
+   			Memo LIKE '%'+#{keywords,jdbcType=VARCHAR}+'%'	
+   			)
+   			
+   		</if>
+   		<if test="isEnable!=null">
+   			AND IsEnable = #{isEnable,jdbcType=BIT}
+   		</if>  
+	</sql>	
+
+	<select id="pagedSearchList" parameterType="JobDTO" resultMap="ScheduleJobVoMap">
+		SELECT *
+		FROM(SELECT  ROW_NUMBER() OVER(ORDER BY TEMP ASC) AS ROWID,* 
+			FROM(SELECT TOP ${endRow} TEMP=Id,<include refid="ScheduleJobColumns" />
+				FROM T_ScheduleJob
+				WHERE 1=1
+				<include refid="pagedSearchFilters" />
+				) TEMP
+			)TEMPTABLE
+   			<![CDATA[WHERE ROWID >= ${startRow}]]>
+	</select>
+
+	<select id="pagedSearchCount" parameterType="JobDTO" resultType="Integer">
+		SELECT count(Id)
+		FROM T_ScheduleJob
+		WHERE 1=1
+		<include refid="pagedSearchFilters" />
+	</select>
+	
+	
+
+	<select id="findId" parameterType="Integer" resultMap="ScheduleJobMap">
+		SELECT
+		<include refid="ScheduleJobColumns" />
+		FROM T_ScheduleJob  WHERE Id = #{id,jdbcType=INTEGER}
+	</select>
+		
+	<select id="findTaskCode" parameterType="String" resultMap="ScheduleJobMap">
+		SELECT
+		<include refid="ScheduleJobColumns" />
+		FROM T_ScheduleJob  WHERE TaskCode = #{taskCode,jdbcType=VARCHAR}
+	</select>
+				
+		
+	<select id="findAll" resultMap="ScheduleJobMap">
+		SELECT 
+		<include refid="ScheduleJobColumns" />
+		FROM T_ScheduleJob
+	</select>	
+	
+	<select id="count"  resultType="Integer">
+		SELECT
+		count(Id)
+		FROM T_ScheduleJob 
+	</select>
+
+	<insert id="insert" parameterType="ScheduleJob" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO T_ScheduleJob(TaskName,TaskCode,IsEnable,IsOrder,Cron,Memo) 
+		values(
+		#{taskName,jdbcType=VARCHAR},
+		#{taskCode,jdbcType=VARCHAR},
+		#{isEnable,jdbcType=BIT},
+		#{isOrder,jdbcType=BIT},
+		#{cron,jdbcType=VARCHAR},
+		#{memo,jdbcType=VARCHAR}
+		)
+	</insert>
+	<delete id="delete" parameterType="Integer">
+		DELETE FROM T_ScheduleJob WHERE Id=#{id,jdbcType=INTEGER}
+	</delete>
+	<update id="update" parameterType="ScheduleJob">
+		UPDATE T_ScheduleJob SET
+		TaskName=#{taskName,jdbcType=VARCHAR},
+		TaskCode=#{taskCode,jdbcType=VARCHAR},
+		IsEnable=#{isEnable,jdbcType=BIT},
+		IsOrder=#{isOrder,jdbcType=BIT},
+		Cron=#{cron,jdbcType=VARCHAR},
+		Memo=#{memo,jdbcType=VARCHAR}
+		WHERE Id=#{id,jdbcType=INTEGER}
+	</update>
+</mapper>
