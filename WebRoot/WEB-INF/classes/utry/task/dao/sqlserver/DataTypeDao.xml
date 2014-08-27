@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="utry.task.dao.DataTypeDao">
+	<resultMap type="DataType" id="DataTypeMap">
+		<id property="id" column="Id" />
+		<result property="name" column="Name" />
+		<result property="memo" column="Memo" />
+	</resultMap>
+
+	<sql id="DataTypeColumns">
+		Id,Name,Memo
+	</sql>
+	
+	<select id="findId" parameterType="Integer" resultMap="DataTypeMap">
+		SELECT
+		<include refid="DataTypeColumns" />
+		FROM T_BASE_DataType  WHERE Id = #{id,jdbcType=INTEGER}
+	</select>
+		
+	<select id="findAll" resultMap="DataTypeMap">
+		SELECT 
+		<include refid="DataTypeColumns" />
+		FROM T_BASE_DataType
+	</select>	
+	
+	<select id="count"  resultType="Integer">
+		SELECT
+		count(Id)
+		FROM T_BASE_DataType 
+	</select>
+	
+
+	<insert id="insert" parameterType="DataType" useGeneratedKeys="true" keyProperty="id">
+		INSERT INTO T_BASE_DataType(Name,Memo) 
+		values(#{name,jdbcType=VARCHAR},#{memo,jdbcType=VARCHAR})
+	</insert>
+	<delete id="delete" parameterType="Integer">
+		DELETE FROM T_BASE_DataType WHERE Id=#{id,jdbcType=INTEGER}
+	</delete>
+	
+	<update id="update" parameterType="DataType">
+		UPDATE T_BASE_DataType SET
+		Name=#{name,jdbcType=VARCHAR},
+		Memo=#{memo,jdbcType=VARCHAR}
+		WHERE Id= #{id,jdbcType=INTEGER}
+	</update>
+</mapper>
