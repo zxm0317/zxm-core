@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC 
+	"-//mybatis.org//DTD Mapper 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="utry.dao.UserInfoDao">
+<sql id="basicData">id,name,age,hobbies</sql>
+<insert id="insertUser" parameterType="UserInfo" useGeneratedKeys="true" keyProperty="id">
+insert into user_info (name,age,hobbies) values(#{name},#{age},#{hobbies})
+</insert>
+
+<select id="getList" resultType="UserInfo">
+select 
+<include refid="basicData"/>
+from user_info
+</select>
+<resultMap type="userinfo" id="userCollectionMap">
+<id column="id" property="id"/>
+<result column="name" property="name"/>
+<collection property="orders" ofType="userOrder" column="user_id">
+<id column="oder_id" property="id"/>
+<result column="price" property="price"/>
+</collection>
+</resultMap>
+<select id="getListByUser" parameterType="userInfo" resultMap="userCollectionMap">
+select
+u.*,o.*
+from user_info u,user_order o where u.id=o.user_id and u.id=#{id}
+</select>
+<resultMap type="userOrder" id="orderCollectionMap">
+<id column="oder_id" property="id"/>
+<result column="price" property="price"/>
+<association property="userInfo" javaType="userInfo">
+<id column="id" property="id"/>
+<result column="name" property="name"/>
+<result column="age" property="age"/>
+<result column="hobbies" property="hobbies"/>
+</association>
+
+</resultMap>
+<select id="getListByOrder" parameterType="userOrder" resultMap="orderCollectionMap">
+select
+u.*,o.*
+from user_info u,user_order o where u.id=o.user_id and o.oder_id=#{id}
+</select>
+</mapper>

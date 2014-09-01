@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration PUBLIC 
+	"-//mybatis.org//DTD Config 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+     
+     <!--<properties resource="../config/sysdb.properties"></properties>  -->
+    <properties>
+     <property name="sysName" value="sqlserver"/>
+    </properties>
+
+	<typeAliases>
+		<typeAlias alias="userInfo" type="utry.pojo.UserInfo" />
+		<typeAlias alias="userOrder" type="utry.pojo.Orders" />
+	</typeAliases>
+	  <mappers>
+	   <!--  <mapper resource="cn/utry/user/dao/IUserDao.xml" /> -->
+	    <mapper resource="utry/dao/sqlserver/userinfo.xml" />
+	</mappers>
+</configuration>	

@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+      http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+      http://www.springframework.org/schema/context
+      http://www.springframework.org/schema/context/spring-context-3.0.xsd
+      http://www.springframework.org/schema/tx 
+      http://www.springframework.org/schema/tx/spring-tx-3.0.xsd 
+      http://www.springframework.org/schema/mvc
+      http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd">
+
+	<!-- 启动注解驱动的Spring MVC功能，注册请求url和注解POJO类方法的映射-->
+	<mvc:annotation-driven />
+
+	<!-- 静态资源无法找到的方法,注：这句如果放最后，图片还是会显示不出来 -->
+	<mvc:default-servlet-handler />
+
+
+	<!-- 启动包扫描功能，以便注册带有@Controller、@Service、@repository、@Component等注解的类成为spring的bean -->
+	<context:component-scan base-package="utry" />
+	<!-- 占位符配置，将外部文件配置参数引入进来 -->
+<!-- 	<bean id="propertyConfigurer" class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+		<property name="fileEncoding" value="UTF-8" />
+		<property name="locations">
+			<list>
+				
+			</list>
+		</property>
+	</bean> -->
+	
+
+	<!-- 视图解释类 -->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" scope="prototype">
+		<property name="prefix" value="/WEB-INF/view/" />
+		<property name="suffix" value=".jsp" />
+		<!--可为空,方便实现自已的依据扩展名来选择视图解释类的逻辑 -->
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView" />
+	</bean>
+	
+
+    <bean id="dataSource"
+		class="org.apache.commons.dbcp.BasicDataSource"
+		destroy-method="close">
+		<property name="driverClassName" value="com.microsoft.sqlserver.jdbc.SQLServerDriver" />
+		<property name="url" value="jdbc:sqlserver://10.0.2.40:1433;database=test" />
+		<property name="username" value="sysDb" />
+		<property name="password" value="sysdb" />
+		<property name="defaultAutoCommit" value="false" />
+		<!-- 初始化连接 -->
+        <property name="initialSize">
+            <value>20</value>
+        </property>
+        <!-- 最大连接数量 -->
+        <property name="maxActive">
+            <value>100</value>
+        </property>
+        <!-- 最大空闲连接 -->
+        <property name="maxIdle">
+            <value>30</value>
+        </property>
+        <!-- 最小空闲连接 -->
+        <property name="minIdle">
+            <value>10</value>
+        </property>
+        <!-- 是否在自动回收超时连接的时候打印连接的超时错误 -->
+        <property name="logAbandoned">
+            <value>true</value>
+        </property>
+        <!-- 是否自动回收超时连接 -->
+        <property name="removeAbandoned">
+            <value>true</value>
+        </property>
+        <!-- 超时时间(以s为单位) -->
+        <property name="removeAbandonedTimeout">
+            <value>20</value>
+        </property>
+        <!-- 超时等待时间（以ms为单位） -->
+        <property name="maxWait">
+            <value>1000</value>
+        </property>
+	</bean>
+
+	<bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" scope="prototype">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+	
+	<!-- 配置事务管理器 -->
+	<bean id="txManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<property name="dataSource" ref="dataSource" />
+	</bean>
+
+	<!-- 采用@Transactional注解方式使用事务   -->
+	<tx:annotation-driven transaction-manager="txManager" />
+
+
+	<bean id="sqlSessionFactory"
+		class="org.mybatis.spring.SqlSessionFactoryBean">
+		<property name="configLocation" value="classpath:myBatis-config.xml" />
+		<property name="dataSource" ref="dataSource" />
+		<!-- <property name="mapperLocations" value="classpath*:cn/utry/sys/dao/sqlserver/*.xml" /> -->
+	</bean>
+
+	<!-- 加载MyBatis配置文件 -->
+	<bean class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+		<property name="basePackage" value="utry.dao" />
+	</bean>
+	
+    
+    <!-- 
+    <mvc:interceptors>
+		 <bean id="IntecepterFilter" class="utry.report.utils.IntecepterFilter"></bean>
+	</mvc:interceptors> 
+    -->
+
+	<!-- <bean id="mongoFactory" class="cn.utry.sys.mongo.MongoFactory">
+		<property name="sysDb" value="sysDb" />
+		<property name="loginInfoTable" value="loginInfoTable" />
+		<property name="serverIp" value="localhost" />
+		<property name="serverPort" value="27017" />
+	</bean>
+ -->
+	<!--   <bean id="mapDao" class="org.mybatis.spring.MapperFactoryBean">
+		<property name="mapperInterface" value="com.mvc.dao.mybatis.IUserDao" />
+		<property name="sqlSessionFactory" ref="sqlSessionFactory" />
+		</bean>
+	-->
+	
+	
+	
+	<!-- 拦截相关url请求 -->
+	<!--  <mvc:interceptors>
+		<mvc:interceptor>
+		<mvc:mapping path="/welcome" />
+		<bean class="com.mvc.util.MyIntecepter"></bean>
+		</mvc:interceptor>
+		</mvc:interceptors>
+	-->
+	
+	
+	<!-- 拦截全部 -->
+	<!-- 
+	<mvc:interceptors>
+		<bean class="cn.utry.util.MyIntecepter"></bean>
+	</mvc:interceptors>
+	 -->
+</beans>
+
